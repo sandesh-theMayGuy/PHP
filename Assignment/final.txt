@@ -1,0 +1,187 @@
+connect.php
+
+//Establishing connection with the database 
+// database name = "login"
+
+
+<?php
+$server = "localhost";
+$user = "root";
+$password = "";
+$database="login";
+$conn = mysqli_connect($server, $user, $password,$database);
+if(!$conn)
+{
+    die("Connection could not be established".mysqli_connect_error());
+
+}
+
+
+login.php
+
+//Login Page
+// Table name = "credentials"
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In</title>
+</head>
+<body>
+
+    <form method="POST">
+    Username : <input type="text" name="username"> <br> <br>
+    Password : <input type="password" name="password"> <br> <br>
+    <button name="login">Log In</button>
+    </form>
+</body>
+</html>
+
+<?php
+include "connect.php";
+
+ if(isset($_POST["login"])){
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    
+    $sql = "select * from credentials where usname='$username'
+    and pw ='$password'limit 1 ";
+
+    $result=mysqli_query($conn,$sql);
+
+    if(mysqli_num_rows($result)==1) 
+    {
+    ?>
+        <script>
+        window.open('form.php',"_self");   
+        </script>
+
+        <?php
+    }
+    else{
+        echo "user name and password mismatch";
+    }
+ }
+ 
+
+
+?>
+
+form.php 
+
+//Form after user logs in 
+//Data of the form is inserted into table named data
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="POST">
+        Name : <input type="text" name="name"> <br><br>
+
+        Faculty : <input type="text" name="faculty"> <br><br>
+
+        Sem : <input type="number" name="sem"> <br><br>
+
+        College : <input type="text" name="college"> <br> <br>
+
+        <button name="submit">Submit</button>
+
+
+        <?php
+
+            include "connect.php";
+
+            if(isset($_POST["submit"]))
+            $name = $_POST["name"];
+            $faculty = $_POST["faculty"];
+            $sem = $_POST["sem"];
+            $college = $_POST["college"];
+
+            $sql = "insert into data values('$name','$faculty' , $sem , '$college')";
+
+            $result = mysqli_query($conn , $sql);
+
+            if($result){
+                ?>
+
+
+                    <script>
+                        window.open("view.php","_self"); 
+                    </script>
+
+            <?php
+            }
+
+            else{
+                echo "Could not insert data";
+            }
+
+        ?>
+    </form>
+</body>
+</html>
+
+
+view.php
+
+//Displaying the  data entered by the user in tabular form
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<table border="1px">
+    <tr>
+        <th>Name</th>
+        <th>Faculty</th>
+        <th>College</th>
+    </tr>
+
+
+    <?php
+
+    include "connect.php";
+
+
+    $sql = "select * from data";
+    $result = mysqli_query($conn, $sql);
+    $num = mysqli_num_rows($result);
+
+    if($num>0){
+        while($row=mysqli_fetch_assoc($result))
+        {
+           ?>
+           <tr>
+            <td><?php echo $row['name']?></td>
+            <td><?php echo $row['faculty']?></td>
+            <td><?php echo $row['college']?></td>
+           </tr>
+           <?php
+       
+        }
+    }
+
+    ?>
+
+</table>
+</body>
+</html>
+
+
+
+
+
